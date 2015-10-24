@@ -58,29 +58,6 @@ SID_ADM=$(egrep  -o "sid.*\>" login_adm2.html | sed -n '1p' | sed 's/sid=//')
 echo "old sid = $SID"
 echo "new sid = $SID_ADM"
 
-getAttachments()
-{
-FILE_IDS=`psql -At -U admin -p 5432 fordsix -c "select attach_id from phpbb_attachments;"`
-
-for FILE_ID in ${FILE_IDS};
-do
-curl -s -b cookie.txt -d "redirect=./../download/file.php" \
-        --user-agent "$USERAGENT" \
-        "${ATTACHURL}${FILE_ID}" -o "${FILE_ID}"
-done
-}
-
-getAvatarADU()
-{
-AVATARS_ADU=`select user_avatar from phpbb_users where user_avatar_type='avatar.driver.upload';`
-for AVATAR_ADU in ${AVATARS_ADU};
-do
-curl -s -b cookie.txt -d "redirect=./../download/file.php" \
-       	--user-agent "$USERAGENT" \
-       	"${AVATARURL}${AVATAR_ADU}" -o "avatars_adu/${AVATAR_ADU}"
-done
-}
-
 
 getBackups()
 {
@@ -139,6 +116,31 @@ fi
 done;
 exit 0;
 }
+
+getAttachments()
+{
+FILE_IDS=`psql -At -U $PGUSER -p $PGPORT $DBNAME -c "select attach_id from phpbb_attachments;"`
+
+for FILE_ID in ${FILE_IDS};
+do
+curl -s -b cookie.txt -d "redirect=./../download/file.php" \
+        --user-agent "$USERAGENT" \
+        "${ATTACHURL}${FILE_ID}" -o "${FILE_ID}"
+done
+}
+
+getAvatarADU()
+{
+AVATARS_ADU=`select user_avatar from phpbb_users where user_avatar_type='avatar.driver.upload';`
+for AVATAR_ADU in ${AVATARS_ADU};
+do
+curl -s -b cookie.txt -d "redirect=./../download/file.php" \
+       	--user-agent "$USERAGENT" \
+       	"${AVATARURL}${AVATAR_ADU}" -o "avatars_adu/${AVATAR_ADU}"
+done
+}
+
+
 
 
 
