@@ -8,7 +8,10 @@ WORKDATE=`date +'%Y%m%d-%T'`
 WORKDAY=`date +'%Y%m%d'`
 
 source ini/settings.ini
+git clone https://github.com/AnatolyUss/FromMySqlToPostgreSql.git my2pg
 
+authPhpBB()
+{
 LOGINURL="${PHPBBFORUMROOT}/ucp.php?mode=login"
 LOGINURL_ADM="${PHPBBFORUMROOT}/adm/index.php"
 
@@ -57,7 +60,7 @@ cat login_adm2.html | grep "You have successfully authenticated and will now be 
 SID_ADM=$(egrep  -o "sid.*\>" login_adm2.html | sed -n '1p' | sed 's/sid=//')
 echo "old sid = $SID"
 echo "new sid = $SID_ADM"
-
+}
 
 getBackups()
 {
@@ -143,9 +146,9 @@ done
 
 
 
-
-getBackups
-loadSql
+ authPhpBB
+# getBackups
+# loadSql
 
 # cleanup
 rm -rf cookie.txt
@@ -153,4 +156,4 @@ rm -rf adm_cookie.txt
 rm -rf login_adm2.html
 rm -rf login_adm.html
 rm -rf login.html
-
+echo "Cleanup cookies, HTML, etc done. Exiting."
