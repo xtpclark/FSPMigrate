@@ -8,7 +8,76 @@ WORKDATE=`date +'%Y%m%d-%T'`
 WORKDAY=`date +'%Y%m%d'`
 
 source ini/settings.ini
+
+configMy2Pg()
+{
 git clone https://github.com/AnatolyUss/FromMySqlToPostgreSql.git my2pg
+
+echo "Checking for $DBNAME on $PGPORT"
+
+PGRES=`psql -At -U ${PGUSER} -h ${PGHOST} ${DBNAME} -c "select now();"`
+RET=$?
+if [ $RET -eq 0 ]
+then
+ echo "Looks like $DBNAME exists, good."
+else
+ echo "Something's wrong, check setup, perhaps you haven't created $DBNAME on $PGHOST port $PGPORT"
+ echo "Verify config or try 'createdb -U ${PGUSER} -h ${PGHOST} ${DBNAME}'"
+fi
+
+echo "Checking for $MYDB on $MYSQLPORT"
+MYRES=`mysql -u $MYSQLUSR -p"${MYSQLPASS}" ${MYDB} -e "select now();"`
+RET=$?
+if [ $RET -eq 0 ]
+then
+ echo "Looks like $MYDB exists, good."
+else
+ echo "Something's wrong, check setup, perhaps you haven't created $MYDB on port $MYSQLPORT"
+ echo "Verify config or try 'mysql -u $MYSQLUSR -p"${MYSQLPASS}" ${MYDB}'"
+fi
+
+cat << EOF > ${MY2PGCONF}
+{
+    "source_description" : [
+        "Connection string to your MySql database"
+    ],
+    "source" : "mysql:host=${MYSQLHOST};port=${MYSQLPORT};dbname=${MYDB},${MYSQLUSR},${MYSQLPASS}",
+    
+    "target_description" : [
+        "Connection string to your PostgreSql database"
+    ],
+    "target" : "pgsql:host=${PGHOST};port=${PGPORT};dbname=${DBNAME},${PGUSER},${PGPASS}",
+    
+    "encoding_description" : [
+        "Encoding type of your PostgreSql database.",
+        "If not supplied, then UTF-8 will be used as a default."
+    ],
+    "encoding" : "UTF-8",
+    
+    "schema_description" : [
+        "schema - a name of the schema, that will contain all migrated tables.",
+        "If not supplied, then a new schema will be created automatically."
+    ],
+    "schema" : "public",
+    
+    "data_chunk_size_description" : [
+        "During migration each table's data will be split into chunks of data_chunk_size (in MB).",
+        "If not supplied, then 10 MB will be used as a default."
+    ],
+    "data_chunk_size" : 10
+}
+EOF
+echo "Wrote out ${MY2PGCONF}"
+
+cat << EOF > my2pg_migration_command.sh
+$(which php)   my2pg/index.php   ${MY2PGCONF}
+EOF
+
+echo "Wrote out migration_command.sh"
+
+
+}
+
 
 authPhpBB()
 {
@@ -145,10 +214,10 @@ done
 
 
 
-
- authPhpBB
-# getBackups
-# loadSql
+configMy2Pg
+authPhpBB
+getBackups
+loadSql
 
 # cleanup
 rm -rf cookie.txt
@@ -157,3 +226,4 @@ rm -rf login_adm2.html
 rm -rf login_adm.html
 rm -rf login.html
 echo "Cleanup cookies, HTML, etc done. Exiting."
+
