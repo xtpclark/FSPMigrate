@@ -1,10 +1,12 @@
 *.gz
 *.sql
 ini/*.ini
+ini/*.json
 adm_cookie.txt
 cookie.txt
 login.html
 login_adm.html
 login_adm2.html
-my2pg
+my2pg*
 my2pg/*
+
