@@ -1,0 +1,37 @@
+## phpBB Board Settings
+## Tested/Developed for phpBB3 3.0.10 on mysql
+## Converts to phpBB3 3.1.6 on PostgreSQL 9.3
+
+## Path to Remote phpbb forum (where config.php is i.e. http://yoursite.com/phpbb3)
+
+PHPBBFORUMROOT=http://yoursite.com/phpBB3
+USERNAME="AdminUser"
+PASSWORD="AdminPass"
+
+## List of phpbb tables you want to back up.
+TABLESBAK=ini/TableList.txt
+BAKDIR=BOARDBACKUP-${WORKDAY}
+
+## Used to post to the create backup page of the ACP
+## i.e. -X POST -d "type=${FULL}&method=${GZIP}&where=download&table%5B%5D=${TABLENAME}&submit=Submit" \
+
+## full, structure, data
+TYPE=full
+## gzip, bzip2, text
+METHOD=gzip
+
+## The output file extension 
+## i.e. phpbb_users becomes phpbb_users.sql.gz
+OUT="sql.gz"
+
+## MySQL DB Settings for the localhost mysql db you want to connect to.
+MYSQLUSR=myAdmin
+MYSQLPASS='myPassword'
+MYDB=myOldDb
+
+## PostgreSQL DB Settings for the localhost.
+PGHOST=localhost
+PGPORT=5432
+PGUSER=pgAdmin
+PGPASS=pgPassword
+DBNAME=pgDevDb

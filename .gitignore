@@ -1,0 +1,9 @@
+*.gz
+*.sql
+ini/*.ini
+adm_cookie.txt
+cookie.txt
+login.html
+login_adm.html
+login_adm2.html
+
