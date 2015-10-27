@@ -23,7 +23,6 @@ phpbb_forums_watch
 phpbb_groups
 phpbb_icons
 phpbb_lang
-phpbb_log
 phpbb_login_attempts
 phpbb_moderator_cache
 phpbb_modules
@@ -64,3 +63,4 @@ phpbb_users
 phpbb_warnings
 phpbb_words
 phpbb_zebra
+phpbb_log

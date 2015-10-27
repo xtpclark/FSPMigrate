@@ -1,5 +1,7 @@
 #!/bin/bash
 
+
+
 # phpBB Automated and Direct Login to Administration Control Panel
 # If your phpBB version works with cookies, try to use the the "-c" option in curl to write a cookie-file
 # and the "-b" command to load a cookie-file
@@ -9,13 +11,14 @@ WORKDAY=`date +'%Y%m%d'`
 
 source ini/settings.ini
 
+
 configMy2Pg()
 {
 git clone https://github.com/AnatolyUss/FromMySqlToPostgreSql.git my2pg
 
 echo "Checking for $DBNAME on $PGPORT"
 
-PGRES=`psql -At -U ${PGUSER} -h ${PGHOST} ${DBNAME} -c "select now();"`
+PGRES=`psql -At -U ${PGUSER} -h ${PGHOST} -p ${PGPORT} ${DBNAME} -c "select now();"`
 RET=$?
 if [ $RET -eq 0 ]
 then
@@ -186,24 +189,30 @@ echo "OK: $file"
 fi
 
 done;
-exit 0;
 }
 
 getAttachments()
 {
-FILE_IDS=`psql -At -U $PGUSER -p $PGPORT $DBNAME -c "select attach_id from phpbb_attachments;"`
+mkdir attachments
+
+FILE_IDS=`psql -At -U $PGUSER -h $PGHOST -p $PGPORT $DBNAME -c "select attach_id from phpbb_attachments limit 10;"`
 
 for FILE_ID in ${FILE_IDS};
 do
 curl -s -b cookie.txt -d "redirect=./../download/file.php" \
         --user-agent "$USERAGENT" \
-        "${ATTACHURL}${FILE_ID}" -o "${FILE_ID}"
+        "${ATTACHURL}${FILE_ID}" -o "attachments/${FILE_ID}"
 done
+
 }
+
 
 getAvatarADU()
 {
-AVATARS_ADU=`select user_avatar from phpbb_users where user_avatar_type='avatar.driver.upload';`
+mkdir avatars_adu
+
+AVATARS_ADU=`psql -At -U $PGUSER -h $PGHOST -p $PGPORT $DBNAME -c "select user_avatar from phpbb_users where user_avatar_type='avatar.driver.upload';"`
+
 for AVATAR_ADU in ${AVATARS_ADU};
 do
 curl -s -b cookie.txt -d "redirect=./../download/file.php" \
@@ -212,12 +221,31 @@ curl -s -b cookie.txt -d "redirect=./../download/file.php" \
 done
 }
 
+while getopts f: option
+do
+        case "${option}"
+        in
+                f) FUNC=$OPTARG;;
+                *} `echo "Pass an option i.e. -f getBackups, loadSql, configMy2Pg, getAttachments, getAvatarADU"`;;
+        esac
+done
 
 
-configMy2Pg
+
 authPhpBB
-getBackups
-loadSql
+
+
+
+`${FUNC}`
+
+# getBackups
+# loadSql
+# configMy2Pg
+
+# getAttachments
+# getAvatarADU
+
+
 
 # cleanup
 rm -rf cookie.txt
@@ -227,3 +255,14 @@ rm -rf login_adm.html
 rm -rf login.html
 echo "Cleanup cookies, HTML, etc done. Exiting."
 
+#with recursive forums as(
+#select 1 as level, forum_id as parent, forum_name from phpbb_forums
+#where parent_id=0
+#UNION ALL
+#select 2, parent_id, '  ---'||forum_name from phpbb_forums
+#where parent_id > 0
+#)
+#select forum_name
+#from forums
+#group by parent,forum_name,level
+#order by parent,level;

@@ -10,3 +10,10 @@ login_adm2.html
 my2pg*
 my2pg/*
 
+attachments/
+files/
+getAttachments.sh
+images/
+migrateLog
+moveFiles.sh
+
