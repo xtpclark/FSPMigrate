@@ -16,4 +16,12 @@ getAttachments.sh
 images/
 migrateLog
 moveFiles.sh
+FSC-20151103-21:00/
+attachments_1103/
+convertmysql.sh
+filesOLD/
+ini/config.jsonOLD
+pg_convert/
+pgconvert/
+phpbbMigrate.sh.save
 

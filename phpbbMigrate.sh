@@ -7,7 +7,7 @@
 # and the "-b" command to load a cookie-file
 
 WORKDATE=`date +'%Y%m%d-%T'`
-WORKDAY=`date +'%Y%m%d'`
+WORKDAY=`date +'%Y%m%d-%H:%M'`
 
 source ini/settings.ini
 
@@ -164,8 +164,13 @@ echo "Check if Errors, otherwise - done."
 }
 
 
+
+
 loadSql()
 {
+BAKDIR=FSC-20151103-21:00
+mysql -u $MYSQLUSR -p"${MYSQLPASS}" mysql  -e "DROP DATABASE IF EXISTS ${MYDB};"
+mysql -u $MYSQLUSR -p"${MYSQLPASS}" mysql  -e "CREATE DATABASE ${MYDB};"
 
 echo "In LoadSQL, cd ${BAKDIR}"
 cd ${BAKDIR}
@@ -195,7 +200,7 @@ getAttachments()
 {
 mkdir attachments
 
-FILE_IDS=`psql -At -U $PGUSER -h $PGHOST -p $PGPORT $DBNAME -c "select attach_id from phpbb_attachments limit 10;"`
+FILE_IDS=`psql -At -U $PGUSER -h $PGHOST -p $PGPORT $DBNAME -c "select attach_id from phpbb_attachments;"`
 
 for FILE_ID in ${FILE_IDS};
 do
@@ -226,17 +231,25 @@ do
         case "${option}"
         in
                 f) FUNC=$OPTARG;;
-                *} `echo "Pass an option i.e. -f getBackups, loadSql, configMy2Pg, getAttachments, getAvatarADU"`;;
         esac
 done
 
 
 
-authPhpBB
+#authPhpBB
+#getBackups
+loadSql
 
+### ${FUNC}
 
+$?
+if [ $? -eq 0 ]
+then
+echo "Something"
+else
+echo "Something Else"
+fi
 
-`${FUNC}`
 
 # getBackups
 # loadSql
